@@ -1,0 +1,152 @@
+openapi: 3.0.3
+
+info:
+  title: scoring models API
+  description: API that allows you to manage models
+  version: 1.0.0
+
+paths:
+  /scoring:
+    get:
+      summary: Returns a list of models
+      description: >
+        A list of models...
+      responses:
+        '200':
+          description: A JSON array of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ScoringModelSchema'
+
+    post:
+      summary: Creates a model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewScoringModelSchema'
+      responses:
+        '201':
+          description: A JSON representation of the created model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringModelSchema'
+
+  /scoring/{model_id}:
+    parameters:
+      - in: path
+        name: model_id
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Returns the details of a specific model
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringModelSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Replaces an existing model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScoringModelSchema'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoringModelSchema'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Deletes an existing order
+      responses:
+        '204':
+          description: The resource was deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+
+components:
+  responses:
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    basicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    ScoringModelsSchema:
+      type: object
+      required:
+        - models
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoringModelSchema'
+
+    ScoringModelSchema:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ScoringModelSchema'
+      required:
+        - id
+        - created
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date-time
+        name:
+          type: string
+
+    NewScoringModelSchema:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/NewScoringModelSchema'
+      required:
+        - name
+      properties:
+        name:
+          type: string
